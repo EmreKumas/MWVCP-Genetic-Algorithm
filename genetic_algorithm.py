@@ -157,6 +157,20 @@ def check_solution(solution):
     return True
 
 
+def construct_mating_pool(pop_size, population):
+
+    mating_pool = []
+
+    for i in range(pop_size):
+
+        # Generate a uniform random number between 0 and pop_size...
+        random_number = random.uniform(0, pop_size)
+
+        mating_pool.append(population[int(random_number)])
+
+    return mating_pool
+
+
 if __name__ == '__main__':
 
     # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
@@ -174,5 +188,8 @@ if __name__ == '__main__':
     # Generate random population...
     population = generate_random_population(pop_size)
 
-    # Repairing infeasible solutions
+    # Repairing infeasible solutions...
     repair_population(pop_size, population)
+
+    # Construct mating pool...
+    mating_pool = construct_mating_pool(pop_size, population)
