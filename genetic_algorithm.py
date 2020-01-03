@@ -158,17 +158,44 @@ def check_solution(solution):
 
 
 def construct_mating_pool(pop_size, population):
-
     mating_pool = []
 
     for i in range(pop_size):
 
-        # Generate a uniform random number between 0 and pop_size...
-        random_number = random.uniform(0, pop_size)
+        # Generate two uniform random number between 0 and pop_size...
+        random_number_1 = random.uniform(0, pop_size)
+        random_number_2 = random.uniform(0, pop_size)
 
-        mating_pool.append(population[int(random_number)])
+        # Get those two solutions from population...
+        solution_1 = population[int(random_number_1)]
+        solution_2 = population[int(random_number_2)]
+
+        # Calculate the fitness values for these solutions...
+        fitness_1 = calculate_fitness_value(solution_1)
+        fitness_2 = calculate_fitness_value(solution_2)
+
+        # For this problem, a better fitness value is the smaller one because it contains fewer vertices...
+        if fitness_1 < fitness_2:
+            mating_pool.append(solution_1)
+        else:
+            mating_pool.append(solution_2)
 
     return mating_pool
+
+
+def calculate_fitness_value(solution):
+    global vertex_count, vertex_weights
+
+    weight_sum = 0.0
+    for i in range(vertex_count):
+
+        # If that vertex is not included, move on...
+        if solution[i] == '0':
+            continue
+
+        weight_sum += vertex_weights[i]
+
+    return weight_sum
 
 
 if __name__ == '__main__':
@@ -191,5 +218,5 @@ if __name__ == '__main__':
     # Repairing infeasible solutions...
     repair_population(pop_size, population)
 
-    # Construct mating pool...
+    # Construct mating pool using binary tournament selection...
     mating_pool = construct_mating_pool(pop_size, population)
