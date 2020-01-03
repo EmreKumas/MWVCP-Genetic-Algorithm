@@ -1,3 +1,8 @@
+import sys
+import os.path
+import re
+
+
 # GLOBAL VARIABLES
 vertex_count = None
 edge_count = None
@@ -54,6 +59,11 @@ def read_file(file_name):
 
 
 def check_solution_length(solution):
+    # Check if solution contains some other characters except 0s and 1s...
+    if re.search("[^0-1]", solution):
+        print("Your solution contains some other characters except 0s and 1s!")
+        exit(-1)
+
     # If the string length is not the same as vertex count, return error...
     if len(solution) != vertex_count:
         print("Error: Solution's length must equal to the vertex count...")
@@ -102,12 +112,25 @@ def get_weight_sum(solution):
 
 if __name__ == '__main__':
 
-    FILE_NAME = 'example_graph_1.txt'
-    read_file(FILE_NAME)
+    # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
+    if len(sys.argv) != 3:
+        print("You didn't run the program with the CORRECT NUMBER of command-line arguments!")
+        print("Usage: python solution_verifier.py graph.txt solution")
+        exit(-1)
 
-    SOLUTION = '1000001'
+    file_name = sys.argv[1]
+
+    # After getting the file name, we need to check if that file exists...
+    if not os.path.isfile(file_name):
+        print("Cannot found the graph file with the filename you provided!")
+        exit(-1)
+
+    # Read the graph
+    read_file(file_name)
+
+    solution = sys.argv[2]
 
     # Verify solution...
-    check_solution_length(SOLUTION)
-    check_edges(SOLUTION)
-    get_weight_sum(SOLUTION)
+    check_solution_length(solution)
+    check_edges(solution)
+    get_weight_sum(solution)
