@@ -231,6 +231,26 @@ def crossover_population(pop_size, crossover_prob, mating_pool):
     return population
 
 
+def mutate_population(pop_size, mutation_prob, population):
+    global vertex_count
+
+    # We will check each solution...
+    for i in range(pop_size):
+
+        # We will generate a random number for each bit of the string...
+        for j in range(vertex_count):
+
+            # Generate a uniform random number between 0 and 1...
+            random_number = random.uniform(0, 1)
+
+            # If the random number is less than or equal to the mutation_prob, we will do mutation...
+            if random_number <= mutation_prob:
+                if population[i][j] == "1":
+                    population[i] = population[i][:j] + "0" + population[i][j + 1:]
+                else:
+                    population[i] = population[i][:j] + "1" + population[i][j + 1:]
+
+
 if __name__ == '__main__':
 
     # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
@@ -259,3 +279,6 @@ if __name__ == '__main__':
 
     # Crossover population with given probability...
     population = crossover_population(pop_size, crossover_prob, mating_pool)
+
+    # Mutating population with given probability...
+    mutate_population(pop_size, mutation_prob, population)
