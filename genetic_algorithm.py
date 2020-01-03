@@ -1,6 +1,8 @@
 import sys
 import os.path
 import re
+import random
+import copy
 
 
 # GLOBAL VARIABLES
@@ -86,6 +88,75 @@ def check_inputs():
     return file_name, num_generations, pop_size, crossover_prob, mutation_prob
 
 
+def generate_random_population(pop_size):
+    global vertex_count
+
+    population = []
+
+    # Initializing population with strings full of zeros...
+    for i in range(pop_size):
+        population.append("0" * vertex_count)
+
+    for i in range(pop_size):
+        for j in range(vertex_count):
+
+            # Generate a uniform random number between 0 and 1...
+            random_number = random.uniform(0, 1)
+
+            # If the random_number is greater than or equal to 0.5, we set that index to one...
+            if random_number >= 0.5:
+                population[i] = population[i][:j] + "1" + population[i][j+1:]
+
+    return population
+
+
+def repair_population(pop_size, population):
+    global vertex_count
+
+    # We will check each solution...
+    for i in range(pop_size):
+
+        # While this solution is not feasible, try to make it feasible...
+        while not check_solution(population[i]):
+
+            # Generate a uniform random number between 0 and vertex_count...
+            random_number = random.uniform(0, vertex_count)
+
+            # We will keep generating a random number, if that location of the solution is not zero...
+            while population[i][int(random_number)] != "0":
+                random_number = random.uniform(0, vertex_count)
+
+            # When we found an index that is zero, we change it to one...
+            population[i] = population[i][:int(random_number)] + "1" + population[i][int(random_number) + 1:]
+
+
+def check_solution(solution):
+    global vertex_count, adjacency_matrix
+
+    # We will copy adjacency matrix, to preserve the original...
+    new_adjacency_matrix = copy.deepcopy(adjacency_matrix)
+
+    # We will convert all edges from one to zero for each included vertex...
+    for row in range(vertex_count):
+
+        # If that vertex is not included, move on...
+        if solution[row] == '0':
+            continue
+
+        # Loop the row...
+        for i in range(vertex_count):
+            new_adjacency_matrix[row][i] = 0
+        # Loop the column...
+        for i in range(vertex_count):
+            new_adjacency_matrix[i][row] = 0
+
+    # Lastly, we will check if adjacency matrix contains ones...
+    if 1 in (1 in i for i in new_adjacency_matrix):
+        return False
+
+    return True
+
+
 if __name__ == '__main__':
 
     # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
@@ -99,3 +170,9 @@ if __name__ == '__main__':
 
     # Read graph file and create adjacency matrix...
     read_file(file_name)
+
+    # Generate random population...
+    population = generate_random_population(pop_size)
+
+    # Repairing infeasible solutions
+    repair_population(pop_size, population)
