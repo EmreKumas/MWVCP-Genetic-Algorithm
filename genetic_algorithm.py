@@ -198,6 +198,39 @@ def calculate_fitness_value(solution):
     return weight_sum
 
 
+def crossover_population(pop_size, crossover_prob, mating_pool):
+    global vertex_count
+
+    population = []
+
+    for i in range(int(pop_size / 2)):
+
+        # Generate a uniform random number between 0 and 1...
+        random_number = random.uniform(0, 1)
+
+        # If the random number is less than or equal to the crossover_prob, we will do crossover...
+        if random_number <= crossover_prob:
+
+            # Generate a uniform random number between 0 and vertex_count...
+            random_number = int(random.uniform(0, vertex_count))
+
+            # Then, get the string till the index number from the first solution, and the rest from the second...
+            # And, the reverse for a second solution...
+            new_solution_1 = mating_pool[i*2][:random_number] + mating_pool[i*2 + 1][random_number:]
+            new_solution_2 = mating_pool[i*2 + 1][:random_number] + mating_pool[i*2][random_number:]
+
+            # Append to population list...
+            population.append(new_solution_1)
+            population.append(new_solution_2)
+
+        # Else, we will pass two parents onto the next generation...
+        else:
+            population.append(mating_pool[i*2])
+            population.append(mating_pool[i*2 + 1])
+
+    return population
+
+
 if __name__ == '__main__':
 
     # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
@@ -220,3 +253,9 @@ if __name__ == '__main__':
 
     # Construct mating pool using binary tournament selection...
     mating_pool = construct_mating_pool(pop_size, population)
+
+    # Shuffling the mating pool...
+    random.shuffle(mating_pool)
+
+    # Crossover population with given probability...
+    population = crossover_population(pop_size, crossover_prob, mating_pool)
