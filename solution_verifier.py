@@ -53,7 +53,61 @@ def read_file(file_name):
     file.close()
 
 
+def check_solution_length(solution):
+    # If the string length is not the same as vertex count, return error...
+    if len(solution) != vertex_count:
+        print("Error: Solution's length must equal to the vertex count...")
+        exit(-1)
+
+
+def check_edges(solution):
+    global vertex_count, adjacency_matrix
+
+    # We will convert all edges from one to zero for each included vertex...
+    for row in range(vertex_count):
+
+        # If that vertex is not included, move on...
+        if solution[row] == '0':
+            continue
+
+        # Loop the row...
+        for i in range(vertex_count):
+            adjacency_matrix[row][i] = 0
+        # Loop the column...
+        for i in range(vertex_count):
+            adjacency_matrix[i][row] = 0
+
+    # Lastly, we will check if adjacency matrix contains ones...
+    if 1 in (1 in i for i in adjacency_matrix):
+        print("Solution is not feasible!")
+        exit(-1)
+    else:
+        print("Solution is feasible!")
+
+
+def get_weight_sum(solution):
+    global vertex_count, vertex_weights
+
+    weight_sum = 0.0
+    for i in range(vertex_count):
+
+        # If that vertex is not included, move on...
+        if solution[i] == '0':
+            continue
+
+        weight_sum += vertex_weights[i]
+
+    print("Solution's weight sum is", weight_sum)
+
+
 if __name__ == '__main__':
 
     FILE_NAME = 'example_graph_1.txt'
     read_file(FILE_NAME)
+
+    SOLUTION = '1000001'
+
+    # Verify solution...
+    check_solution_length(SOLUTION)
+    check_edges(SOLUTION)
+    get_weight_sum(SOLUTION)
