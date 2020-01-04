@@ -251,6 +251,36 @@ def mutate_population(pop_size, mutation_prob, population):
                     population[i] = population[i][:j] + "1" + population[i][j + 1:]
 
 
+def print_outputs(current_generation, population, pop_size):
+    best_solution = None
+    best_solution_fitness = sys.maxsize
+    overall_solution_fitness = 0
+    worst_solution_fitness = 0
+
+    for pop in population:
+
+        fitness = calculate_fitness_value(pop)
+
+        # Checking the best solution...
+        if fitness < best_solution_fitness:
+            best_solution = pop
+            best_solution_fitness = fitness
+
+        # Checking the worst solution fitness...
+        if fitness > worst_solution_fitness:
+            worst_solution_fitness = fitness
+
+        # Adding to overall fitness...
+        overall_solution_fitness += fitness
+
+    # Printing results...
+    print("Generation", current_generation, "is created...")
+    print("Best solution is", best_solution)
+    print("Best solution's fitness is", best_solution_fitness)
+    print("Average solution fitness is", (overall_solution_fitness / pop_size))
+    print("Worst solution's fitness is", worst_solution_fitness, "\n")
+
+
 if __name__ == '__main__':
 
     # Checking if the program has run with the CORRECT NUMBER of command-line arguments...
@@ -271,14 +301,23 @@ if __name__ == '__main__':
     # Repairing infeasible solutions...
     repair_population(pop_size, population)
 
-    # Construct mating pool using binary tournament selection...
-    mating_pool = construct_mating_pool(pop_size, population)
+    # Run the algorithm for given number of generations...
+    for current_generation in range(num_generations):
 
-    # Shuffling the mating pool...
-    random.shuffle(mating_pool)
+        # Construct mating pool using binary tournament selection...
+        mating_pool = construct_mating_pool(pop_size, population)
 
-    # Crossover population with given probability...
-    population = crossover_population(pop_size, crossover_prob, mating_pool)
+        # Shuffling the mating pool...
+        random.shuffle(mating_pool)
 
-    # Mutating population with given probability...
-    mutate_population(pop_size, mutation_prob, population)
+        # Crossover population with given probability...
+        population = crossover_population(pop_size, crossover_prob, mating_pool)
+
+        # Mutating population with given probability...
+        mutate_population(pop_size, mutation_prob, population)
+
+        # Repairing infeasible solutions...
+        repair_population(pop_size, population)
+
+        # Lastly, print some outputs...
+        print_outputs((current_generation + 1), population, pop_size)
