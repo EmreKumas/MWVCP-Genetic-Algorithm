@@ -264,7 +264,14 @@ def mutate_population(pop_size, mutation_prob, population):
                     population[i] = population[i][:j] + "1" + population[i][j + 1:]
 
 
-def print_outputs(current_generation, population, pop_size):
+def create_output_file(file_name, num_generations, pop_size, crossover_prob, mutation_prob):
+
+    output_file_name = "solution" + "_" + file_name + "_" + str(num_generations) + "_" + str(pop_size) + "_" + \
+                       str(crossover_prob) + "_" + str(mutation_prob) + ".txt"
+    return open(output_file_name, 'w')
+
+
+def print_outputs(current_generation, population, pop_size, output_file):
     best_solution = None
     best_solution_fitness = sys.maxsize
     overall_solution_fitness = 0
@@ -293,6 +300,13 @@ def print_outputs(current_generation, population, pop_size):
     print("Average solution fitness is", (overall_solution_fitness / pop_size))
     print("Worst solution's fitness is", worst_solution_fitness, "\n")
 
+    # Writing to file...
+    output_file.write("Generation {} is created...\n".format(current_generation))
+    output_file.write("Best solution is {}\n".format(best_solution))
+    output_file.write("Best solution's fitness is {}\n".format(best_solution_fitness))
+    output_file.write("Average solution fitness is {}\n".format((overall_solution_fitness / pop_size)))
+    output_file.write("Worst solution's fitness is {}\n\n".format(worst_solution_fitness))
+
 
 if __name__ == '__main__':
 
@@ -307,6 +321,9 @@ if __name__ == '__main__':
 
     # Read graph file and create adjacency matrix...
     read_file(file_name)
+
+    # Create output file...
+    output_file = create_output_file(file_name, num_generations, pop_size, crossover_prob, mutation_prob)
 
     # Generate random population...
     population = generate_random_population(pop_size)
@@ -333,4 +350,4 @@ if __name__ == '__main__':
         repair_population(pop_size, population)
 
         # Lastly, print some outputs...
-        print_outputs((current_generation + 1), population, pop_size)
+        print_outputs((current_generation + 1), population, pop_size, output_file)
