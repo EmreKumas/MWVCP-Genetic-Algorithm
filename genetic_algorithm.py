@@ -2,7 +2,7 @@ import sys
 import os.path
 import re
 import random
-import copy
+import marshal
 
 
 # GLOBAL VARIABLES
@@ -111,13 +111,17 @@ def generate_random_population(pop_size):
 
 
 def repair_population(pop_size, population):
-    global vertex_count
+    global vertex_count, adjacency_matrix
 
     # We will check each solution...
     for i in range(pop_size):
 
+        # Creating a new adjacency matrix for a faster usage...
+        new_adjacency_matrix = marshal.loads(marshal.dumps(adjacency_matrix))
+        for_special_index = None
+
         # While this solution is not feasible, try to make it feasible...
-        while not check_solution(population[i]):
+        while not check_solution(population[i], new_adjacency_matrix, for_special_index):
 
             # Generate a uniform random number between 0 and vertex_count...
             random_number = random.uniform(0, vertex_count)
@@ -127,28 +131,37 @@ def repair_population(pop_size, population):
                 random_number = random.uniform(0, vertex_count)
 
             # When we found an index that is zero, we change it to one...
-            population[i] = population[i][:int(random_number)] + "1" + population[i][int(random_number) + 1:]
+            for_special_index = int(random_number)
+            population[i] = population[i][:for_special_index] + "1" + population[i][for_special_index + 1:]
 
 
-def check_solution(solution):
-    global vertex_count, adjacency_matrix
+def check_solution(solution, new_adjacency_matrix, for_special_index):
+    global vertex_count
 
-    # We will copy adjacency matrix, to preserve the original...
-    new_adjacency_matrix = copy.deepcopy(adjacency_matrix)
+    # We have two cases, if for_special_index is None, we will look for all included vertices...
+    if for_special_index is None:
+        # We will convert all edges from one to zero for each included vertex...
+        for row in range(vertex_count):
 
-    # We will convert all edges from one to zero for each included vertex...
-    for row in range(vertex_count):
+            # If that vertex is not included, move on...
+            if solution[row] == '0':
+                continue
 
-        # If that vertex is not included, move on...
-        if solution[row] == '0':
-            continue
+            # Loop the row...
+            for i in range(vertex_count):
+                new_adjacency_matrix[row][i] = 0
+            # Loop the column...
+            for i in range(vertex_count):
+                new_adjacency_matrix[i][row] = 0
 
+    # Otherwise, we will look for just that index number...
+    else:
         # Loop the row...
         for i in range(vertex_count):
-            new_adjacency_matrix[row][i] = 0
+            new_adjacency_matrix[for_special_index][i] = 0
         # Loop the column...
         for i in range(vertex_count):
-            new_adjacency_matrix[i][row] = 0
+            new_adjacency_matrix[i][for_special_index] = 0
 
     # Lastly, we will check if adjacency matrix contains ones...
     if 1 in (1 in i for i in new_adjacency_matrix):
