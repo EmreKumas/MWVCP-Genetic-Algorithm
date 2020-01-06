@@ -11,6 +11,9 @@ edge_count = None
 vertex_weights = []
 adjacency_matrix = [[]]
 
+overall_best_solution = None
+overall_best_solution_fitness = sys.maxsize
+
 
 # noinspection PyUnusedLocal
 def read_file(file_name):
@@ -272,6 +275,8 @@ def create_output_file(file_name, num_generations, pop_size, crossover_prob, mut
 
 
 def print_outputs(current_generation, population, pop_size, output_file):
+    global overall_best_solution, overall_best_solution_fitness
+
     best_solution = None
     best_solution_fitness = sys.maxsize
     overall_solution_fitness = 0
@@ -292,6 +297,11 @@ def print_outputs(current_generation, population, pop_size, output_file):
 
         # Adding to overall fitness...
         overall_solution_fitness += fitness
+
+    # Before printing the results, we should update the overall best solution...
+    if best_solution_fitness < overall_best_solution_fitness:
+        overall_best_solution_fitness = best_solution_fitness
+        overall_best_solution = best_solution
 
     # Printing results...
     print("Generation", current_generation, "is created...")
@@ -351,3 +361,9 @@ if __name__ == '__main__':
 
         # Lastly, print some outputs...
         print_outputs((current_generation + 1), population, pop_size, output_file)
+
+    # After all generations complete, we print overall best solution...
+    print("Overall best solution is", overall_best_solution)
+    print("Overall best solution's fitness is", overall_best_solution_fitness)
+    output_file.write("Overall best solution is {}\n".format(overall_best_solution))
+    output_file.write("Overall best solution's fitness is {}".format(overall_best_solution_fitness))
